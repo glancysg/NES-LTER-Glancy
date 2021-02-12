@@ -8,42 +8,58 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+when importing data set, change mmLenght, Total_prey and Total_gut to numeric values
+ how to change row names after import
+ 
+```{r}
+library(readxl)
+Spring2019 <- read_excel("C:/Users/Sarah/Desktop/WHOI/LTER/201902/LTER201902_FishGuts.xlsx", 
+    col_types = c("numeric", "numeric", "text", 
+        "numeric", "text", "text", "text", 
+        "text", "text", "text", "numeric", 
+        "text", "numeric", "numeric", "text", 
+        "text"))
+View(Spring2019)
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
+ 
+ Spring2019 %>% 
+  rename(
+    Length(mm) = mmLength )
 
 ```{r}
+
+
 kable(Spring2019)
 ```
 
 I need to seperate this table into two, one that has unique identifiers for prey and another that had fish with counts from each prey type it contains. 
 
 selecting out specific rows and then naming a new data file with just those rows in them. 
-portland_flights <- flights %>% 
-  filter(dest == "PDX")
-View(portland_flights)
+Example: portland_flights <- flights %>% 
+            filter(dest == "PDX")
+            View(portland_flights)
 ```{r}
 FishCount <- Spring2019 %>% 
-  filter(Total_prey != "NA")
+  filter(Total_prey != "NA") %>%
+           filter(GutItem != "Parasite")
 View(FishCount)
+
+```
+
+create another data table with only the rows that have unique prey ID with measurements 
+```{r}
+
+PreyMeas <- Spring2019 %>% 
+  filter(Prey_mm != "NA")
+View(PreyMeas)
+```
+
+finally create table that has parasite info- will be remainder of rows. 
+
+```{r}
+Parasites <- Spring2019 %>% 
+  filter(GutItem == "Parasite")
+View(Parasites)
 
 ```
 
