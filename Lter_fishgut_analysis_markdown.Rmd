@@ -22,6 +22,9 @@ Spring2019 <- read_excel("C:/Users/Sarah/Desktop/WHOI/LTER/201902/LTER201902_Fis
 View(Spring2019)
 ```
  
+ 
+ Warnings in above are from the NAs in the numeric columns
+ 
  Spring2019 %>% 
   rename(
     Length(mm) = mmLength )
@@ -60,6 +63,78 @@ finally create table that has parasite info- will be remainder of rows.
 Parasites <- Spring2019 %>% 
   filter(GutItem == "Parasite")
 View(Parasites)
+
+```
+
+Starting some analysis
+
+n() counts the number of ROWS in each each group
+
+```{r}
+
+by_FSpecies <- Spring2019 %>% 
+  group_by(FishSpecies) %>% 
+  summarize(count = n())
+by_origin
+```
+
+###
+start attempting data summarizing
+
+```{r}
+
+summary_FishSp_TotGut <- Spring2019 %>% 
+  group_by(FishSpecies) %>% 
+  summarize(mean = mean(Total_gut, na.rm = TRUE))
+summary_FishSp_TotGut
+```
+ there is a misspelling where one is capatilized in P_tri attempting to change to all match
+ 
+```{r}
+install.packages(mudata2)
+
+recode(Spring2019$FishSpecies, p_tri = "P_tri" )
+
+summary_FishSp_TotGut <- Spring2019 %>% 
+  group_by(FishSpecies) %>% 
+  summarize(mean = mean(Total_gut, na.rm = TRUE))
+
+summary_FishSp_TotGut
+```
+ rename the "mean" column
+ 
+```{r}
+
+rename (summary_FishSp_TotGut, "Mean prey items" = "mean")
+
+summary_FishSp_TotGut
+```
+```{r}
+print(summary_FishSp_TotGut)
+```
+more specific groupings
+```{r}
+summary_FishSp_preytype <- PreyMeas %>% 
+  group_by(GutItem) %>%
+  summarize(mean = mean(Prey_mm, na.rm = TRUE))
+
+ summary_GutItem <- summary_FishSp_preytype
+ 
+ summary_GutItem
+```
+requires renaming or "recoding" some of the variables again. 
+
+```{r}
+
+recode(FishCount$GutItem, candacia = "Candacia", polychaeta ="polychaeta" )
+
+summary_GutItem
+
+```
+count the number of fish for each species. 
+
+```{r}
+
 
 ```
 
