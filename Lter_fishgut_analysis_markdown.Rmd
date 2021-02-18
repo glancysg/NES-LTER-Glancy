@@ -75,7 +75,7 @@ n() counts the number of ROWS in each each group
 by_FSpecies <- Spring2019 %>% 
   group_by(FishSpecies) %>% 
   summarize(count = n())
-by_origin
+by_FSpecies
 ```
 
 ###
@@ -131,10 +131,99 @@ recode(FishCount$GutItem, candacia = "Candacia", polychaeta ="polychaeta" )
 summary_GutItem
 
 ```
-count the number of fish for each species. 
+count the number of fish for each species. might need to create a uniqie identifier for each fish??
+
+data(brussels_reviews_anno)
+x <- brussels_reviews_anno
+x$doc_sent_id <- unique_identifier(x, fields = c("doc_id", "sentence_id"))
+head(x, 15)
+range(x$doc_sent_id)
+x$doc_sent_id <- unique_identifier(x, fields = c("doc_id", "sentence_id"), start_from = 10)
+head(x, 15)
+range(x$doc_sent_id)
+
+```{r}
+install.packages("udpipe")
+Spring2019$FishUniq <- unique_identifier(Spring2019, fields = c("Cruise", "Station", "FishSpecies", "FishNum"))
+
+head(Spring2019, 15)
+
+range(Spring2019$FishUniq)
+
+ Spring2019 %>%
+   count(Cruise, Station, FishSpecies, FishNum )
+
+```
+created a column of unique identifiers, but the total is not equal to the number of fish sampled. 
+```{r}
+
+by_FSpecies <- Spring2019 %>% 
+  group_by(FishUniq) %>% 
+  summarize(count = n())
+by_FSpecies
+
+summary(Spring2019$FishUniq)
+```
+making a smaller tibble and then joining later using my new unique identifier
 
 ```{r}
 
+NoPrey_table <-  Spring2019 %>% 
+  distinct(FishSpecies, Station, FishNum, .keep_all = TRUE) %>%
+  count(FishSpecies)
 
+Spring2019 %>%
+  count(FishSpecies, Station, FishNum)
+  
+NoPrey_table
+```
+
+there are still dumplicates, i'll try to find out of it is the station that is somehow not unique
+```{r}
+recode(FishCount$FishSpecies, p_tri = "P_tri" )
+
+##recode(Spring2019$FishSpecies, p_tri = "P_tri" ) ## this worked above, why not here
+
+Summary_FishCount <- Spring2019 %>% 
+  group_by(FishSpecies) %>%
+  summarize(count = n())
+
+ Summary_FishCount
+```
+group by and then mutate to add variable to use for statistics
+split to create a new dataframe
+long to wide transformation?
+```{r}
+Spring2019_wide <- Spring2019 %>%
+  pivot_wider(
+  id_cols = FishSpecies,
+  names_from = FishUniq,
+  names_prefix = "",
+  names_sep = "_",
+  names_glue = NULL,
+  names_sort = FALSE,
+  names_repair = "check_unique",
+  values_from = Total_gut,
+  values_fill = NULL,
+  values_fn = NULL
+)
+
+Spring2019 %>%
+  pivot_wider(id_cols = FishSpecies, 
+              names_from = FishUniq,
+              values_from = Total_gut
+              
+              )
+
+```
+
+```{r}
+Spring2019 %>%
+  select(FishUniq, FishSpecies, Station) %>%
+  group_by(FishUniq, FishSpecies) %>%
+  count()
+
+
+  
 ```
 
