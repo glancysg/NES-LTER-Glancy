@@ -226,4 +226,181 @@ Spring2019 %>%
 
   
 ```
+###Notes from Bret Longworth, 02-19-2021
+#green is his original, and active code is my adaptatons
 
+---
+title: "Fish Counts"
+output:
+  html_document:
+    df_print: paged
+---
+
+Load libraries and data
+
+```{r}
+#library(tidyverse)
+#library(readxl)
+#library(gt)
+
+#df <- read_excel("~/Desktop/LTER201902_FishGuts.xlsx")
+#str(df)
+#df 
+str(Spring2019)
+#df 
+
+```
+
+# How many fish of each species?
+
+Select relevant fields. Each of these fish has duplicate rows for each gut item. For counting, we need one row per fish. Finally, if we count the number of each species, that should give us the number by species.
+
+```{r}
+#df %>%
+  #select(Station, FishSpecies, FishNum) %>% 
+  #distinct() %>% 
+  #count(FishSpecies)
+
+Spring2019 %>%
+  select(Station, FishSpecies, FishNum) %>% 
+  distinct() %>% 
+  count(FishSpecies)
+
+
+
+```
+create a bar plot of the fish per species. ## this is still not working
+
+```{r}
+
+#FishSpDist <- Spring2019 %>%
+  #select(Station, FishSpecies, FishNum) %>% 
+  #distinct() %>% 
+  #count(FishSpecies) 
+
+#ggplot(FishSpDist, aes(FishSpecies), ymax = 35) +
+  #geom_bar() 
+  
+```
+
+
+# How many fish per station?
+
+```{r}
+#df %>%
+  #select(Station, FishSpecies, FishNum) %>% 
+  #distinct() %>% 
+  #count(Station)
+
+Spring2019 %>%
+  select(Station, FishSpecies, FishNum) %>% 
+  distinct() %>% 
+  count(Station)
+
+
+```
+
+# How many fish of each species at each station
+
+I would like to make a stacked bar plot, with either the stations across the bottom or the fish species, so we can see the distribution of species between stations
+
+```{r}
+#df %>%
+  #select(Station, FishSpecies, FishNum) %>% 
+  #distinct() %>% 
+  #count(Station, FishSpecies)
+
+Spring2019 %>%
+  select(Station, FishSpecies, FishNum) %>% 
+  distinct() %>% 
+  count( FishSpecies, Station)
+```
+
+# How many fish of each species had eaten each prey type?
+
+No longer need `distinct()` to get individual fish because we're now interested in gut content. We can still use `distinct()` to give unique prey types instead of "number of samples that are GutItem.
+
+##the below needs to be further refined, it's too much. -SG
+
+```{r}
+#df %>%
+  #select(Station, FishSpecies, FishNum, GutItem) %>% 
+  #count(FishSpecies, GutItem)
+
+Spring2019 %>%
+  select(Station, FishSpecies, FishNum, GutItem) %>% 
+  count(FishSpecies, GutItem)
+```
+
+```{r}
+#df %>%
+  #select(Station, FishSpecies, FishNum, GutItem) %>% 
+  #distinct() %>% 
+  #count(FishSpecies, GutItem)
+
+Spring2019 %>%
+  select(Station, FishSpecies, FishNum, GutItem) %>% 
+  distinct() %>% 
+  count(FishSpecies, GutItem)
+```
+
+To make this a more human-readable table, we can pivot to a wider table, with columns for each FishSpecies. This also tells us that the GutItem column needs some recoding.
+
+```{r}
+#df %>%
+  #select(Station, FishSpecies, FishNum, GutItem) %>% 
+  #distinct() %>% 
+  #count(FishSpecies, GutItem) %>% 
+  #pivot_wider(names_from = FishSpecies, values_from = n) %>% 
+  #arrange(GutItem)
+
+recode(Spring2019$GutItem, candacia = "Candacia", CHaetognatha = "Chaetognatha")
+
+Spring2019 %>%
+  select(Station, FishSpecies, FishNum, GutItem) %>% 
+  distinct() %>% 
+  count(FishSpecies, GutItem) %>% 
+  pivot_wider(names_from = FishSpecies, values_from = n) %>% 
+  arrange(GutItem)
+```
+
+##Using recode() on the gut item column to fix the duplicates. should also look at station to make sure there are no duplicates there. -SG
+
+```{r}
+
+ 
+
+```
+
+
+To start on the stats questions, here's the above table broken out by station. I'm using the GT library for the table, which is great for publication-quality tables!
+
+
+```{r}
+#df %>%
+  #select(Station, FishSpecies, FishNum, GutItem) %>% 
+  #distinct() %>% 
+  #group_by(Station) %>% 
+  #count(FishSpecies, GutItem) %>% 
+  #pivot_wider(names_from = FishSpecies, values_from = n) %>% 
+  #arrange(Station, GutItem) %>% 
+  #gt()
+
+
+
+library(gt)
+
+?gt()
+
+
+Spring2019 %>%
+  select(Station, FishSpecies, FishNum, GutItem) %>% 
+  distinct() %>% 
+  group_by(Station) %>% 
+  count(FishSpecies, GutItem) %>% 
+  pivot_wider(names_from = FishSpecies, values_from = n) %>% 
+  arrange(Station, GutItem) %>% 
+  gt()
+
+```
+### End Bret's notes
