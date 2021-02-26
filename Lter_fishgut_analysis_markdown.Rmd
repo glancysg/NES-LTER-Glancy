@@ -12,22 +12,61 @@ when importing data set, change mmLenght, Total_prey and Total_gut to numeric va
  how to change row names after import
  
 ```{r}
+# import libraries
 library(readxl)
+library(ggplot2)
+library(gtable)
+library(gt)
+library(knitr)
+library(mudata2)
+library(rmarkdown)
+library(tidyr)
+library(tidyverse)  # includes dplyr
+library(tidyselect)
+
+install.packages(googledrive)
+library(googledrive)
+install.packages(googlesheets4)
+library(googlesheets4)
+
+```
+
+###compied form Stace's github
+
+```{r}
+
+# Google Sheet is the input
+#myurl <- "https://docs.google.com/spreadsheets/d/1JFbSLtNj13bYjw5NaaPqSwDMTRj8sm9F5iLo-mXzoOo/edit?usp=sharing" # url for googlesheet
+#gs4_auth() # manual authorization thru web browser
+#samples <- drive_get(myurl) # manual authorization thru web browser
+
+myurl <- "https://docs.google.com/spreadsheets/d/1YGec28ofuRGa4eYvOeh3IUT5YAbvs6Xi7gnRlKtHyDQ/edit?usp=sharing"
+gs4_auth()
+LTERDiets_GD <- drive_get(myurl)
+
+gs4_get(LTERDiets_GD)
+
+
+LTER_Diets <- read_excel("C:/Users/Sarah/Desktop/WHOI/LTER/LTER_ForageFish_Diets.xlsx", 
+    col_types = c("numeric", "numeric", "text", 
+        "numeric", "numeric", "text", "text", 
+        "text", "text", "text", "numeric", 
+        "text", "numeric", "numeric", "text", 
+        "text"))
+View(LTER_Diets)
+
 Spring2019 <- read_excel("C:/Users/Sarah/Desktop/WHOI/LTER/201902/LTER201902_FishGuts.xlsx", 
     col_types = c("numeric", "numeric", "text", 
         "numeric", "text", "text", "text", 
         "text", "text", "text", "numeric", 
         "text", "numeric", "numeric", "text", 
-        "text"))
+        "text"),
+     na ="")
 View(Spring2019)
 ```
  
  
  Warnings in above are from the NAs in the numeric columns
- 
- Spring2019 %>% 
-  rename(
-    Length(mm) = mmLength )
 
 ```{r}
 
@@ -51,10 +90,10 @@ View(FishCount)
 
 create another data table with only the rows that have unique prey ID with measurements 
 ```{r}
-
-PreyMeas <- Spring2019 %>% 
-  filter(Prey_mm != "NA")
-View(PreyMeas)
+summari
+#PreyMeas <- Spring2019 %>% 
+#  filter(Prey_mm != "NA")
+#View(PreyMeas)
 ```
 
 finally create table that has parasite info- will be remainder of rows. 
@@ -392,7 +431,6 @@ library(gt)
 
 ?gt()
 
-
 Spring2019 %>%
   select(Station, FishSpecies, FishNum, GutItem) %>% 
   distinct() %>% 
@@ -402,5 +440,22 @@ Spring2019 %>%
   arrange(Station, GutItem) %>% 
   gt()
 
+#Spring2019 %>%
+  #select(Station, FishSpecies, FishNum, GutItem) %>% 
+  #distinct() %>% 
+  #group_by(FishSpecies) %>% 
+  #count(Station, GutItem) %>% 
+  #pivot_wider(names_from = Station, values_from = n) %>% 
+  #arrange(FishSpecies, GutItem) %>% 
+  #gt()
+
 ```
 ### End Bret's notes
+
+attempt at finding any duplicates
+
+```{r}
+
+duplicated(Spring2019)
+```
+
